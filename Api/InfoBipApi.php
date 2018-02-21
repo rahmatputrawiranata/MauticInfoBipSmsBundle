@@ -78,7 +78,7 @@ class InfoBipApi extends AbstractSmsApi
     protected function sanitizeNumber($number)
     {
         $util   = PhoneNumberUtil::getInstance();
-        $parsed = $util->parse($number, 'US');
+        $parsed = $util->parse($number, 'ID');
 
         return $util->format($parsed, PhoneNumberFormat::E164);
     }
@@ -90,6 +90,40 @@ class InfoBipApi extends AbstractSmsApi
      * @return bool|string
      */
     public function sendSms($number, $content)
+    {
+        if ($number === null) {
+            return false;
+        }
+
+        $messageBody = $content;
+
+        try{
+            $url = "http://reguler.sms-notifikasi.com/apps/smsapi.php?userkey=".$this->username."&passkey=".$this->password."&nohp=".$number."&pesan=".$messageBody;
+
+            $curl = curl_init();            
+            curl_setopt($curl, CURLOPT_URL, $url);
+            curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+            curl_exec($curl);
+            curl_close($curl);
+        }
+        catch(Exception $e) {
+            $this->logger->addWarning(
+                $e->getMessage(),
+                ['exception' => $e]
+            );
+            return false;
+        }
+
+		return true;
+    }
+
+    /**
+     * @param string $number
+     * @param string $content
+     *
+     * @return bool|string
+     */
+    public function deprecatedSendSms($number, $content)
     {
         if ($number === null) {
             return false;
