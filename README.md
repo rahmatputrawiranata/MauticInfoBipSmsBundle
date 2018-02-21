@@ -1,6 +1,6 @@
 ## Synopsis
 
-This plugin allows to send SMS messages through http://sms-notifikasi.com/ service provider API. It is based on the current version of and Twilio plugin available in the default Mautic install package, and also on [Infobip](https://github.com/mjlogan/MauticInfoBipSmsBundle "Infobip Repo") plugin for previous Mautic versions written by @abreuleonel and @mjlogan .
+This plugin allows to send SMS messages through http://sms-notifikasi.com/ service provider API not infobip anymore. It is based on the current version of and Twilio plugin available in the default Mautic install package, and also on [Infobip](https://github.com/mjlogan/MauticInfoBipSmsBundle "Infobip Repo") plugin for previous Mautic versions written by @abreuleonel and @mjlogan .
 
 ## Motivation
 
@@ -8,7 +8,7 @@ The lack a of an updated version of the original Infobip plugin as well as the a
 
 ## Installation
 
-- Copy the MauticCustomSmsBundle to the plugins folder.
+- Copy the MauticInfoBipSmsBundle to the plugins folder.
 - Go to the Configuration -> Plugins Settings, in Mautic web interface.
 - Click on Install/Upgrade Plugins.
 - The plugin should now be available for configuration.
