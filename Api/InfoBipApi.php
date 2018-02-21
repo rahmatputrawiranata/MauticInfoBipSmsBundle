@@ -98,7 +98,7 @@ class InfoBipApi extends AbstractSmsApi
         $messageBody = $content;
 
         try{
-            $url = "http://reguler.sms-notifikasi.com/apps/smsapi.php?userkey=".$this->username."&passkey=".$this->password."&nohp=".$number."&pesan=".$messageBody;
+            $url = "http://reguler.sms-notifikasi.com/apps/smsapi.php?userkey=".$this->username."&passkey=".$this->password."&nohp=".$number."&pesan=".urlencode($content);
 
             $curl = curl_init();            
             curl_setopt($curl, CURLOPT_URL, $url);
