@@ -1,5 +1,4 @@
 <?php
-
 /*
  * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      André Rocha
@@ -41,6 +40,8 @@ class InfoBipApi extends AbstractSmsApi
      */
     protected $sendingPhoneNumber;
 
+    
+
     /**
      * InfoBipApi constructor.
      *
@@ -78,7 +79,7 @@ class InfoBipApi extends AbstractSmsApi
     protected function sanitizeNumber($number)
     {
         $util   = PhoneNumberUtil::getInstance();
-        $parsed = $util->parse($number, 'ID');
+        $parsed = $util->parse($number, 'US');
 
         return $util->format($parsed, PhoneNumberFormat::E164);
     }
@@ -91,6 +92,7 @@ class InfoBipApi extends AbstractSmsApi
      */
     public function sendSms($number, $content)
     {
+
         if ($number === null) {
             return false;
         }
@@ -98,43 +100,10 @@ class InfoBipApi extends AbstractSmsApi
         $messageBody = $content;
 
         try{
-            $url = "http://reguler.sms-notifikasi.com/apps/smsapi.php?userkey=".$this->username."&passkey=".$this->password."&nohp=".$number."&pesan=".urlencode($content);
-
-            $curl = curl_init();            
-            curl_setopt($curl, CURLOPT_URL, $url);
-            curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-            curl_exec($curl);
-            curl_close($curl);
-        }
-        catch(Exception $e) {
-            $this->logger->addWarning(
-                $e->getMessage(),
-                ['exception' => $e]
-            );
-            return false;
-        }
-
-		return true;
-    }
-
-    /**
-     * @param string $number
-     * @param string $content
-     *
-     * @return bool|string
-     */
-    public function deprecatedSendSms($number, $content)
-    {
-        if ($number === null) {
-            return false;
-        }
-
-        $messageBody = $content;
-
-        try{
-            $number = '+55' . $number;
+            $number = $number;
             
             $url = "http://api.infobip.com/sms/1/text/single";
+            $curl = curl_init();
             
             $headers = [
                 'Authorization: Basic '. base64_encode("{$this->username}:{$this->password}"),
@@ -143,20 +112,18 @@ class InfoBipApi extends AbstractSmsApi
             ];
             
             $data = [
-                'from' => "InfoSMS",
+                'from' => $this->sendingPhoneNumber,
                 'to' => $number,
                 'text' => $messageBody,
-                'language' => ['languageCode' => 'PT'],
-                'transliteration' => 'NON_UNICODE'
             ];
-
-            $curl = curl_init();            
+            
             curl_setopt($curl, CURLOPT_URL, $url);
             curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
             curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
             curl_setopt($curl, CURLOPT_POSTFIELDS, json_encode($data));
             curl_exec($curl);
             curl_close($curl);
+            
         }
         catch(Exception $e) {
             $this->logger->addWarning(
@@ -167,5 +134,7 @@ class InfoBipApi extends AbstractSmsApi
         }
 
 		return true;
+
     }
 }
+

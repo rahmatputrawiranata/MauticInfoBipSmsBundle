@@ -67,7 +67,7 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface
      * @param MessageQueueModel $messageQueueModel
      * @param AbstractSmsApi    $smsApi
      */
-    public function __construct(TrackableModel $pageTrackableModel, LeadModel $leadModel, MessageQueueModel $messageQueueModel, AbstractSmsApi $smsApi)
+    public function __construct(TrackableModel $pageTrackableModel, LeadModel $leadModel, MessageQueueModel $messageQueueModel,         AbstractSmsApi $smsApi)
     {
         $this->pageTrackableModel = $pageTrackableModel;
         $this->leadModel          = $leadModel;
@@ -299,7 +299,7 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface
                         'status'  => 'mautic.sms.timeline.status.delivered',
                         'id'      => $sms->getId(),
                         'name'    => $sms->getName(),
-                        'content' => $tokenEvent->getContent()
+                        'content' => $tokenEvent->getContent(),
                     ];
 
                     $metadata = $this->smsApi->sendSms($leadPhoneNumber, $tokenEvent->getContent());
@@ -324,38 +324,7 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface
             $this->getStatRepository()->saveEntities($stats);
             $this->em->clear(Stat::class);
         }
-        return $results;
-    }
 
-    public function sendSmsExample(Sms $sms, $sendTo) {
-        $sentCount     = 0;
-        $results       = [];
-        if (empty($sendTo)) {
-            $results = [
-                'sent'   => false,
-                'status' => 'mautic.sms.campaign.failed.missing_number',
-            ];
-        } else {
-
-            $sendResult = [
-                'sent'    => false,
-                'type'    => 'mautic.sms.sms',
-                'status'  => 'mautic.sms.timeline.status.delivered',
-                'id'      => $sms->getId(),
-                'name'    => $sms->getName(),
-                'content' => $sms->getMessage()
-            ];
-
-            $metadata = $this->smsApi->sendSms($sendTo, $sms->getMessage());
-
-            if (true !== $metadata) {
-                $sendResult['status'] = $metadata;
-            } else {
-                $sendResult['sent'] = true;
-                ++$sentCount;
-            }
-            $results = $sendResult;
-        }
         return $results;
     }
 

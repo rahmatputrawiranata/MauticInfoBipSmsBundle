@@ -16,7 +16,7 @@ use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 /**
  * Class SmsType.
@@ -44,7 +44,7 @@ class SmsType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->addEventSubscriber(new CleanFormSubscriber(['content' => 'html', 'customHtml' => 'html']));
-        $builder->addEventSubscriber(new FormExitSubscriber('infobipsms.sms', $options));
+        $builder->addEventSubscriber(new FormExitSubscriber('sms.sms', $options));
 
         $builder->add(
             'name',
@@ -167,13 +167,13 @@ class SmsType extends AbstractType
     }
 
     /**
-     * @param OptionsResolver $resolver
+     * @param OptionsResolverInterface $resolver
      */
-    public function configureOptions(OptionsResolver $resolver)
+    public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
         $resolver->setDefaults(
             [
-                'data_class' => 'MauticPlugin\MauticInfoBipSmsBundle\Entity\Sms',
+                'data_class' => null,
             ]
         );
 

@@ -17,7 +17,6 @@ use Mautic\LeadBundle\Controller\EntityContactsTrait;
 use MauticPlugin\MauticInfoBipSmsBundle\Entity\Sms;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
-use MauticPlugin\MauticInfoBipSmsBundle\Form\Type\ExampleSendType;
 
 class SmsController extends FormController
 {
@@ -31,7 +30,7 @@ class SmsController extends FormController
     public function indexAction($page = 1)
     {
         /** @var \MauticPlugin\InfoBipSmsBundle\Model\SmsModel $model */
-        $model = $this->getModel('infobipsms.sms');
+        $model = $this->getModel('sms');
 
         //set some permissions
         $permissions = $this->get('mautic.security')->isGranted(
@@ -149,7 +148,7 @@ class SmsController extends FormController
     public function viewAction($objectId)
     {
         /** @var \MauticPlugin\InfoBipSmsBundle\Model\SmsModel $model */
-        $model    = $this->getModel('infobipsms.sms');
+        $model    = $this->getModel('sms');
         $security = $this->get('mautic.security');
 
         /** @var \MauticPlugin\InfoBipSmsBundle\Entity\Sms $sms */
@@ -252,8 +251,8 @@ class SmsController extends FormController
     public function newAction($entity = null)
     {
         /** @var \MauticPlugin\InfoBipSmsBundle\Model\SmsModel $model */
-        $model = $this->getModel('infobipsms.sms');
-        
+        $model = $this->getModel('sms');
+
         if (!$entity instanceof Sms) {
             /** @var \MauticPlugin\InfoBipSmsBundle\Entity\Sms $entity */
             $entity = $model->getEntity();
@@ -277,10 +276,10 @@ class SmsController extends FormController
         if ($updateSelect) {
             $entity->setSmsType('template');
         }
-        
+
         //create the form
         $form = $model->createForm($entity, $this->get('form.factory'), $action, ['update_select' => $updateSelect]);
-        
+
         ///Check for a submitted form and process it
         if ($method == 'POST') {
             $valid = false;
@@ -387,7 +386,7 @@ class SmsController extends FormController
     public function editAction($objectId, $ignorePost = false, $forceTypeSelection = false)
     {
         /** @var \MauticPlugin\InfoBipSmsBundle\Model\SmsModel $model */
-        $model   = $this->getModel('infobipsms.sms');
+        $model   = $this->getModel('sms');
         $method  = $this->request->getMethod();
         $entity  = $model->getEntity($objectId);
         $session = $this->get('session');
@@ -551,7 +550,7 @@ class SmsController extends FormController
      */
     public function cloneAction($objectId)
     {
-        $model  = $this->getModel('infobipsms.sms');
+        $model  = $this->getModel('sms');
         $entity = $model->getEntity($objectId);
 
         if ($entity != null) {
@@ -595,7 +594,7 @@ class SmsController extends FormController
         ];
 
         if ($this->request->getMethod() == 'POST') {
-            $model  = $this->getModel('infobipsms.sms');
+            $model  = $this->getModel('sms');
             $entity = $model->getEntity($objectId);
 
             if ($entity === null) {
@@ -657,7 +656,7 @@ class SmsController extends FormController
         ];
 
         if ($this->request->getMethod() == 'POST') {
-            $model = $this->getModel('infobipsms.sms');
+            $model = $this->getModel('sms');
             $ids   = json_decode($this->request->query->get('ids', '{}'));
 
             $deleteIds = [];
@@ -716,7 +715,7 @@ class SmsController extends FormController
     public function previewAction($objectId)
     {
         /** @var \MauticPlugin\InfoBipSmsBundle\Model\SmsModel $model */
-        $model    = $this->getModel('infobipsms.sms');
+        $model    = $this->getModel('sms');
         $sms      = $model->getEntity($objectId);
         $security = $this->get('mautic.security');
 
@@ -748,84 +747,6 @@ class SmsController extends FormController
             'sms_message_stats',
             'sms',
             'sms_id'
-        );
-    }
-
-    /**
-     * Generating the modal box content for
-     * the send multiple example email option.
-     */
-    public function sendExampleAction($objectId)
-    {
-        $model  = $this->getModel('infobipsms.sms');
-        $entity = $model->getEntity($objectId);
-
-        //not found or not allowed
-        if ($entity === null
-            || (!$this->get('mautic.security')->hasEntityAccess(
-                'sms:smses:viewown',
-                'sms:smses:viewother',
-                $entity->getCreatedBy()
-            ))
-        ) {
-            return $this->postActionRedirect(
-                [
-                    'passthroughVars' => [
-                        'closeModal' => 1,
-                        'route'      => false,
-                    ],
-                ]
-            );
-        }
-
-        // Get the quick add form
-        $action = $this->generateUrl('mautic_sms_action', ['objectAction' => 'sendExample', 'objectId' => $objectId]);
-        $user   = $this->get('mautic.helper.user')->getUser();
-
-        $form = $this->createForm(ExampleSendType::class, ['emails' => ['list' => [$user->getEmail()]]], ['action' => $action]);
-        /* @var \Mautic\EmailBundle\Model\EmailModel $model */
-
-        if ($this->request->getMethod() == 'POST') {
-            $isCancelled = $this->isFormCancelled($form);
-            $isValid     = $this->isFormValid($form);
-            if (!$isCancelled && $isValid) {
-                $phoneNumber = $form['number']->getData();
-
-                $errors = [];
-                if (!empty($phoneNumber)) {
-                    $result = $model->sendSmsExample($entity, $phoneNumber);
-
-                    if (empty($result['sent'])) {
-                        array_push($errors, $result['status']);
-                    }
-                }
-
-                if (count($errors) != 0) {
-                    $this->addFlash(implode('; ', $errors));
-                } else {
-                    $this->addFlash('SMS Example sent');
-                }
-            }
-
-            if ($isValid || $isCancelled) {
-                return $this->postActionRedirect(
-                    [
-                        'passthroughVars' => [
-                            'closeModal' => 1,
-                            'route'      => false,
-                        ],
-                    ]
-                );
-            }
-        }
-
-        return $this->delegateView(
-            [
-                'viewParameters' => [
-                    'form' => $form->createView(),
-                ],
-                'contentTemplate' => 'MauticInfoBipSmsBundle:Sms:recipients.html.php',
-            ]
         );
     }
 }

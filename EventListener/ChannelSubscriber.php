@@ -61,13 +61,13 @@ class ChannelSubscriber extends CommonSubscriber
                 'sms',
                 [
                     MessageModel::CHANNEL_FEATURE => [
-                        'campaignAction'             => 'sms.infobip.send_text_sms',
+                        'campaignAction'             => 'sms.send_text_sms',
                         'campaignDecisionsSupported' => [
                             'page.pagehit',
                             'asset.download',
                             'form.submit',
                         ],
-                        'lookupFormType' => 'sms_list',
+                        'lookupFormType' => 'infobipsmssms_list',
                         'repository'     => 'MauticInfoBipSmsBundle:Sms',
                     ],
                     LeadModel::CHANNEL_FEATURE   => [],

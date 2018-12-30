@@ -68,12 +68,12 @@ class CampaignSubscriber extends CommonSubscriber
 
         if ($integration && $integration->getIntegrationSettings()->getIsPublished()) {
             $event->addAction(
-                'sms.infobip.send_text_sms',
+                'sms.send_text_sms',
                 [
                     'label'            => 'mautic.campaign.sms.send_text_sms',
                     'description'      => 'mautic.campaign.sms.send_text_sms.tooltip',
                     'eventName'        => SmsEvents::ON_CAMPAIGN_TRIGGER_ACTION,
-                    'formType'         => 'smssend_list',
+                    'formType'         => 'infobipsmssend_list',
                     'formTypeOptions'  => ['update_select' => 'campaignevent_properties_sms'],
                     'formTheme'        => 'MauticInfoBipSmsBundle:FormTheme\SmsSendList',
                     'timelineTemplate' => 'MauticInfoBipSmsBundle:SubscribedEvents\Timeline:index.html.php',
